@@ -73,6 +73,9 @@ public sealed class MyAppSession : AppSession
 
     internal async ValueTask SaveAsync(List<ArraySegment<byte>> body)
     {
+        if (Channel.IsClosed)
+            return;
+
         var fileStream = FileStream;
 
         ArgumentNullException.ThrowIfNull(fileStream);
