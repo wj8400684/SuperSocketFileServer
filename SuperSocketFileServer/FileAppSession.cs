@@ -49,7 +49,7 @@ public sealed class FileAppSession : AppSession
         return base.OnSessionClosedAsync(e);
     }
 
-    internal async ValueTask CreateFileAsync(string name)
+    internal async ValueTask CreateFileAsync(string fileName, string? relativePath)
     {
         using var _ = await _lock.EnterAsync();
 
@@ -58,10 +58,15 @@ public sealed class FileAppSession : AppSession
         if (fileStream != null)
             throw new Exception();
 
-        if (!Directory.Exists(FileDirectory))
-            Directory.CreateDirectory(FileDirectory);
+        //拼接完整目录
+        var fullDirector = Path.Combine(FileDirectory, relativePath ?? string.Empty);
 
-        var filePath = Path.Combine(FileDirectory, name);
+        //不存在目录则创建
+        if (!Directory.Exists(fullDirector))
+            Directory.CreateDirectory(fullDirector);
+
+        //拼接完整路径
+        var filePath = Path.Combine(fullDirector, fileName);
 
         if (File.Exists(filePath))
             _fileStream = new(filePath, FileMode.Open, FileAccess.ReadWrite);

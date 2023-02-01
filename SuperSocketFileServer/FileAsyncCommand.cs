@@ -25,26 +25,35 @@ public abstract class FileAsyncCommand<TPackageInfo> : IAsyncCommand<FileAppSess
 }
 
 public abstract class FileAsyncCommand<TPackageInfo, TAckPackageInfo> : IAsyncCommand<FileAppSession, FilePackageInfo>
-    where TPackageInfo : FilePackageInfo
-    where TAckPackageInfo : FileAckPackageInfo
+    where TPackageInfo : FilePackageInfo, new()
+    where TAckPackageInfo : FileAckPackageInfo, new()
 {
     async ValueTask IAsyncCommand<FileAppSession, FilePackageInfo>.ExecuteAsync(FileAppSession session, FilePackageInfo package)
     {
         if (session.IsClosed())
             return;
 
-        TAckPackageInfo ackPackage;
+        TAckPackageInfo? ackPackage = null;
 
         try
         {
             ackPackage = await ExecuteAsync(session, (TPackageInfo)package);
         }
-        catch (Exception)
+        catch (ArgumentNullException)
         {
+            ackPackage = new() { SuccessFul = false, ErrorMessage = "参数错误" };
             throw;
         }
-
-        await session.SendPackageAsync(ackPackage);
+        catch (Exception)
+        {
+            ackPackage = new() { SuccessFul = false, ErrorMessage = "未知错误" };
+            throw;
+        }
+        finally
+        {
+            if (ackPackage != null)
+                await session.SendPackageAsync(ackPackage);
+        }
     }
 
     protected abstract ValueTask<TAckPackageInfo> ExecuteAsync(FileAppSession session, TPackageInfo package);

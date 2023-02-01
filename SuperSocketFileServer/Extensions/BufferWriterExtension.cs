@@ -20,7 +20,19 @@ internal static class BufferWriterExtension
         return v1;
     }
 
-    public static int WriterInt32(this IBufferWriter<byte> writer, int value)
+    public static int WriterShort(this IBufferWriter<byte> writer, short value)
+    {
+        const int v1 = sizeof(short);
+
+        var buffer = writer.GetSpan(v1);
+
+        BinaryPrimitives.WriteInt16LittleEndian(buffer, value);
+        writer.Advance(v1);
+
+        return v1;
+    }
+
+    public static int WriterInt(this IBufferWriter<byte> writer, int value)
     {
         const int v1 = sizeof(int);
 
@@ -32,13 +44,13 @@ internal static class BufferWriterExtension
         return v1;
     }
 
-    public static int WriterShort(this IBufferWriter<byte> writer, short value)
+    public static int WriterLong(this IBufferWriter<byte> writer, long value)
     {
-        const int v1 = sizeof(short);
+        const int v1 = sizeof(long);
 
         var buffer = writer.GetSpan(v1);
 
-        BinaryPrimitives.WriteInt16LittleEndian(buffer, value);
+        BinaryPrimitives.WriteInt64LittleEndian(buffer, value);
         writer.Advance(v1);
 
         return v1;

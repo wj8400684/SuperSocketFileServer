@@ -4,14 +4,12 @@ using SuperSocketFileServer;
 namespace supersocketIocpServer;
 
 [Command(Key = (byte)FileCommandKey.Data)]
-public sealed class DataCommand : FileAsyncCommand<DataPackageInfo, DataAckPackageInfo>
+public sealed class DataCommand : FileAsyncCommand<DataPackageInfo>
 {
-    protected override async ValueTask<DataAckPackageInfo> ExecuteAsync(FileAppSession session, DataPackageInfo package)
+    protected override async ValueTask ExecuteAsync(FileAppSession session, DataPackageInfo package)
     {
         ArgumentNullException.ThrowIfNull(package.Body);
 
         await session.SaveAsync(package.Body);
-
-        return new DataAckPackageInfo { SuccessFul = true };
     }
 }

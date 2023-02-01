@@ -31,6 +31,3 @@ public sealed class DataPackageInfo : FilePackageInfo
     }
 }
 
-public sealed class DataAckPackageInfo : FileAckPackageInfo
-{
-}
