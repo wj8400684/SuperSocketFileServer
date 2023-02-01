@@ -1,6 +1,5 @@
 using System.Buffers;
 using System.Buffers.Binary;
-using System.Runtime.InteropServices;
 using SuperSocket.ProtoBase;
 using SuperSocketFileServer;
 

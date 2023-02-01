@@ -8,6 +8,7 @@ using supersocketIocpServer;
 
 await SuperSocketHostBuilder.Create<FilePackageInfo, FilePipeLineFilter>()
     .UseSession<MyAppSession>()
+    .UsePackageDecoder<FilePacketDecode>()
     .UseCommand(options => options.AddCommandAssembly(typeof(Data).Assembly))
     .ConfigureServices(
         (context, service) => service.AddSingleton<IPackageEncoder<FilePackageInfo>, FilePackageEncode>())
