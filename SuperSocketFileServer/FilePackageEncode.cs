@@ -8,12 +8,9 @@ namespace supersocketIocpServer;
 internal sealed class FilePackageEncode : IPackageEncoder<FilePackageInfo>
 {
     private const int HeadSize = sizeof(short);
-    private const int CmdSize = sizeof(byte);
 
     public int Encode(IBufferWriter<byte> writer, FilePackageInfo pack)
     {
-        int bodyLength = CmdSize;
-
         #region 获取头部字节缓冲区 2 byte
 
         var headBuffer = writer.GetSpan(HeadSize);
@@ -23,7 +20,7 @@ internal sealed class FilePackageEncode : IPackageEncoder<FilePackageInfo>
 
         #region 写入命令 1 byte
 
-        writer.WriterBit((byte)pack.Key);
+        var bodyLength = writer.WriterBit((byte)pack.Key);
 
         #endregion
 
