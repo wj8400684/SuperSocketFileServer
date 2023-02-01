@@ -13,7 +13,6 @@ internal sealed class FilePackageEncode : IPackageEncoder<FilePackageInfo>
 
     public int Encode(IBufferWriter<byte> writer, FilePackageInfo pack)
     {
-        var cmd = (byte)pack.Key;
         int bodyLength = CmdSize;
 
         #region 获取头部字节缓冲区 2 byte
@@ -25,9 +24,7 @@ internal sealed class FilePackageEncode : IPackageEncoder<FilePackageInfo>
 
         #region 写入命令 1 byte
 
-        var cmdBuffer = writer.GetSpan(CmdSize);
-        MemoryMarshal.Write(cmdBuffer, ref cmd);
-        writer.Advance(CmdSize);
+        writer.WriterBit((byte)pack.Key);
 
         #endregion
 

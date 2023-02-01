@@ -39,25 +39,14 @@ public abstract class FileAckPackageInfo : FilePackageInfo
 
     public override int EncodeBody(IBufferWriter<byte> writer)
     {
-        const int v1 = sizeof(byte);
-
-        var successFul = SuccessFul;
-        var successFulBuffer = writer.GetSpan(v1);
-        MemoryMarshal.Write(successFulBuffer, ref successFul);
-        writer.Advance(v1);
+        var length = writer.WriterBit(SuccessFul ? (byte)1 : (byte)0);
 
         //如果没有错误或者错误为空不写入
-        if (successFul || string.IsNullOrWhiteSpace(ErrorMessage))
-            return v1;
+        if (SuccessFul || string.IsNullOrWhiteSpace(ErrorMessage))
+            return length;
 
-        var errorMessageLength = ErrorMessage.Length;
-        var errorMessageBuffer = writer.GetSpan(v1);
+        length += writer.WriterStringWithLength(ErrorMessage);
 
-        MemoryMarshal.Write(errorMessageBuffer, ref errorMessageLength);
-        writer.Advance(v1);
-
-        var length = writer.Write(ErrorMessage, Encoding.UTF8);
-
-        return v1 + v1 + length;
+        return length;
     }
 }
