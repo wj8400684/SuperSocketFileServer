@@ -1,6 +1,7 @@
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
+using Microsoft.Extensions.Logging;
 using SuperSocket;
 using SuperSocket.Channel;
 using SuperSocket.IOCPTcpChannel;

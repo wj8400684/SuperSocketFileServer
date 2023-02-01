@@ -8,7 +8,7 @@ public sealed class UpLoadPackageInfo : FilePackageInfo
 {
     public string? FileName { get; set; }
 
-    public int FileSize { get; set; }
+    public long FileLength { get; set; }
 
     public override int EncodeBody(IBufferWriter<byte> writer)
     {
@@ -20,7 +20,7 @@ public sealed class UpLoadPackageInfo : FilePackageInfo
         reader.TryRead(out byte fileNameLength);
         FileName = reader.ReadString(Encoding.UTF8, fileNameLength);
 
-        reader.TryReadLittleEndian(out int fileLength);
-        FileSize = fileLength;
+        reader.TryReadLittleEndian(out long fileLength);
+        FileLength = fileLength;
     }
 }

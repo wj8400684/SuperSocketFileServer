@@ -4,7 +4,7 @@ namespace SuperSocketFileServer;
 public enum FileCommandKey : byte
 {
     None = 0,
-    Data = 1,
-    Upload = 2,
+    Upload = 1,
+    Data = 2,
     End = 3,
 }

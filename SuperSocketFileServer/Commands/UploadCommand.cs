@@ -10,7 +10,7 @@ public sealed class UploadCommand : FileAsyncCommand<UpLoadPackageInfo>
     {
         ArgumentNullException.ThrowIfNull(package.FileName);
 
-        session.LogInformation($"开始传输文件：[{package.FileName}] 长度：{package.FileSize}");
+        session.LogInformation($"开始传输文件：[{package.FileName}] 长度：{package.FileLength}");
 
         await session.CreateFileAsync(package.FileName);
     }

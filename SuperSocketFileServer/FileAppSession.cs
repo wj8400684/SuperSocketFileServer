@@ -2,8 +2,6 @@ using SuperSocket.Channel;
 using SuperSocket.ProtoBase;
 using SuperSocket.Server;
 using SuperSocketFileServer;
-using System.IO;
-using System.IO.Pipes;
 
 namespace supersocketIocpServer;
 
@@ -13,7 +11,7 @@ public sealed class FileAppSession : AppSession
 
     private readonly IPackageEncoder<FilePackageInfo> _packageEncoder;
 
-    private AsyncLock _lock = new();
+    private readonly AsyncLock _lock = new();
 
     private FileStream? _fileStream;
 
@@ -47,6 +45,7 @@ public sealed class FileAppSession : AppSession
         _lock.Dispose();
         _fileStream = null;
 
+        Logger.LogInformation("销毁文件流");
         return base.OnSessionClosedAsync(e);
     }
 
@@ -92,6 +91,8 @@ public sealed class FileAppSession : AppSession
         var fileStream = _fileStream;
 
         ArgumentNullException.ThrowIfNull(fileStream);
+
+        await fileStream.FlushAsync();
 
         fileStream.Close();
         fileStream.Dispose();
