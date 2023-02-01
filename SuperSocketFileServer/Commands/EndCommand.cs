@@ -7,12 +7,12 @@ namespace SuperSocketFileServer;
 [Command(Key = (byte)FileCommandKey.End)]
 public sealed class EndCommand : FileAsyncCommand<EndPackageInfo, EndAckPackageInfo>
 {
-    protected override ValueTask<EndAckPackageInfo> ExecuteAsync(FileAppSession session, EndPackageInfo package)
+    protected override async ValueTask<EndAckPackageInfo> ExecuteAsync(FileAppSession session, EndPackageInfo package)
     {
         session.LogInformation($"文件传输结束");
 
-        session.CloseFile();
+        await session.CloseFileAsync();
 
-        return ValueTask.FromResult(new EndAckPackageInfo { SuccessFul = true });
+        return new EndAckPackageInfo { SuccessFul = true };
     }
 }

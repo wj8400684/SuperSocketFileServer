@@ -3,6 +3,7 @@ using SuperSocket.ProtoBase;
 using SuperSocket.Server;
 using SuperSocketFileServer;
 using System.IO;
+using System.IO.Pipes;
 
 namespace supersocketIocpServer;
 
@@ -12,18 +13,23 @@ public sealed class FileAppSession : AppSession
 
     private readonly IPackageEncoder<FilePackageInfo> _packageEncoder;
 
-    internal object _fileRoot = new();
+    private AsyncLock _lock = new();
 
-    internal FileStream? FileStream { get; set; }
+    private FileStream? _fileStream;
 
     public FileAppSession(IPackageEncoder<FilePackageInfo> encoder)
     {
         _packageEncoder = encoder;
     }
 
-    public ValueTask SendPackageAsync(FilePackageInfo packageInfo)
+    internal bool IsClosed()
     {
-        if (Channel.IsClosed)
+        return Channel.IsClosed;
+    }
+
+    internal ValueTask SendPackageAsync(FilePackageInfo packageInfo)
+    {
+        if (IsClosed())
             return ValueTask.CompletedTask;
 
         return Channel.SendAsync(_packageEncoder, packageInfo);
@@ -31,43 +37,39 @@ public sealed class FileAppSession : AppSession
 
     protected override ValueTask OnSessionClosedAsync(CloseEventArgs e)
     {
-        var fileStream = FileStream;
+        var fileStream = _fileStream;
 
         if (fileStream == null)
             return base.OnSessionClosedAsync(e);
 
         fileStream.Close();
         fileStream.Dispose();
-        FileStream = null;
+        _lock.Dispose();
+        _fileStream = null;
 
         return base.OnSessionClosedAsync(e);
     }
 
-    internal void CreateFile(string name)
+    internal async ValueTask CreateFileAsync(string name)
     {
-        lock (_fileRoot)
-        {
-            var fileStream = FileStream;
+        using var _ = await _lock.EnterAsync();
 
-            if (fileStream != null)
-                throw new Exception();
+        var fileStream = _fileStream;
 
-            if (!Directory.Exists(FileDirectory))
-                Directory.CreateDirectory(FileDirectory);
+        if (fileStream != null)
+            throw new Exception();
 
-            var filePath = Path.Combine(FileDirectory, name);
+        if (!Directory.Exists(FileDirectory))
+            Directory.CreateDirectory(FileDirectory);
 
-            if (File.Exists(filePath))
-            {
-                FileStream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite);
-            }
-            else
-            {
-                FileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            }
+        var filePath = Path.Combine(FileDirectory, name);
 
-            FileStream.Position = FileStream.Length;
-        }
+        if (File.Exists(filePath))
+            _fileStream = new(filePath, FileMode.Open, FileAccess.ReadWrite);
+        else
+            _fileStream = new(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+        _fileStream.Position = _fileStream.Length;
     }
 
     internal async ValueTask SaveAsync(List<ArraySegment<byte>> body)
@@ -75,7 +77,7 @@ public sealed class FileAppSession : AppSession
         if (Channel.IsClosed)
             return;
 
-        var fileStream = FileStream;
+        var fileStream = _fileStream;
 
         ArgumentNullException.ThrowIfNull(fileStream);
 
@@ -83,17 +85,16 @@ public sealed class FileAppSession : AppSession
             await fileStream.WriteAsync(item);
     }
 
-    internal void CloseFile()
+    internal async ValueTask CloseFileAsync()
     {
-        lock (_fileRoot)
-        {
-            var fileStream = FileStream;
+        using var _ = await _lock.EnterAsync();
 
-            ArgumentNullException.ThrowIfNull(fileStream);
+        var fileStream = _fileStream;
 
-            fileStream.Close();
-            fileStream.Dispose();
-            FileStream = null;
-        }
+        ArgumentNullException.ThrowIfNull(fileStream);
+
+        fileStream.Close();
+        fileStream.Dispose();
+        _fileStream = null;
     }
 }

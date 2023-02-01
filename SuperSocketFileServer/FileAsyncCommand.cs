@@ -8,6 +8,9 @@ public abstract class FileAsyncCommand<TPackageInfo> : IAsyncCommand<FileAppSess
 {
     async ValueTask IAsyncCommand<FileAppSession, FilePackageInfo>.ExecuteAsync(FileAppSession session, FilePackageInfo package)
     {
+        if (session.IsClosed())
+            return;
+
         try
         {
             await ExecuteAsync(session, (TPackageInfo)package);
@@ -27,6 +30,9 @@ public abstract class FileAsyncCommand<TPackageInfo, TAckPackageInfo> : IAsyncCo
 {
     async ValueTask IAsyncCommand<FileAppSession, FilePackageInfo>.ExecuteAsync(FileAppSession session, FilePackageInfo package)
     {
+        if (session.IsClosed())
+            return;
+
         TAckPackageInfo ackPackage;
 
         try
