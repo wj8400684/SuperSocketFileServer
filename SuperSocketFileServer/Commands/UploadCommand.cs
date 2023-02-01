@@ -4,10 +4,10 @@ using supersocketIocpServer;
 
 namespace SuperSocketFileServer;
 
-[Command(Key = (byte)CommandKey.Upload)]
-public sealed class Upload : FileAsyncCommand<UpLoadPackageInfo>
+[Command(Key = (byte)FileCommandKey.Upload)]
+public sealed class UploadCommand : FileAsyncCommand<UpLoadPackageInfo>
 {
-    protected override ValueTask ExecuteAsync(MyAppSession session, UpLoadPackageInfo package)
+    protected override ValueTask ExecuteAsync(FileAppSession session, UpLoadPackageInfo package)
     {
         ArgumentNullException.ThrowIfNull(package.FileName);
 

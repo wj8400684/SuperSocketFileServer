@@ -3,10 +3,10 @@ using SuperSocketFileServer;
 
 namespace supersocketIocpServer;
 
-[Command(Key = (byte)CommandKey.Data)]
-public sealed class Data : FileAsyncCommand<DataPackageInfo, DataAckPackageInfo>
+[Command(Key = (byte)FileCommandKey.Data)]
+public sealed class DataCommand : FileAsyncCommand<DataPackageInfo, DataAckPackageInfo>
 {
-    protected override async ValueTask<DataAckPackageInfo> ExecuteAsync(MyAppSession session, DataPackageInfo package)
+    protected override async ValueTask<DataAckPackageInfo> ExecuteAsync(FileAppSession session, DataPackageInfo package)
     {
         ArgumentNullException.ThrowIfNull(package.Body);
 

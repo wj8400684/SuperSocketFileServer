@@ -1,7 +1,7 @@
 ﻿
 namespace SuperSocketFileServer;
 
-public enum CommandKey : byte
+public enum FileCommandKey : byte
 {
     None = 0,
     Data = 1,

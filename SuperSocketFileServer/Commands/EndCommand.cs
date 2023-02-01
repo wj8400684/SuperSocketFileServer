@@ -4,10 +4,10 @@ using supersocketIocpServer;
 
 namespace SuperSocketFileServer;
 
-[Command(Key = (byte)CommandKey.End)]
-public sealed class End : FileAsyncCommand<EndPackageInfo, EndAckPackageInfo>
+[Command(Key = (byte)FileCommandKey.End)]
+public sealed class EndCommand : FileAsyncCommand<EndPackageInfo, EndAckPackageInfo>
 {
-    protected override ValueTask<EndAckPackageInfo> ExecuteAsync(MyAppSession session, EndPackageInfo package)
+    protected override ValueTask<EndAckPackageInfo> ExecuteAsync(FileAppSession session, EndPackageInfo package)
     {
         session.LogInformation($"文件传输结束");
 

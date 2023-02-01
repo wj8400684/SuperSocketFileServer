@@ -3,14 +3,16 @@ using System.Buffers;
 
 namespace SuperSocketFileServer;
 
-internal sealed class FilePacketDecode : IPackageDecoder<FilePackageInfo>
+internal sealed class FilePackageDecode : IPackageDecoder<FilePackageInfo>
 {
-    public FilePacketDecode()
+    private const int HeadSize = 2;
+
+    public FilePackageDecode()
     {
         _packetFactories = new IPacketFactory[4];
-        RegisterPacketType<DataPackageInfo>(CommandKey.Data);
-        RegisterPacketType<EndPackageInfo>(CommandKey.End);
-        RegisterPacketType<UpLoadPackageInfo>(CommandKey.Upload);
+        RegisterPacketType<DataPackageInfo>(FileCommandKey.Data);
+        RegisterPacketType<EndPackageInfo>(FileCommandKey.End);
+        RegisterPacketType<UpLoadPackageInfo>(FileCommandKey.Upload);
     }
 
     private IPacketFactory[] _packetFactories;
@@ -29,7 +31,7 @@ internal sealed class FilePacketDecode : IPackageDecoder<FilePackageInfo>
         }
     }
 
-    public void RegisterPacketType<TPacket>(CommandKey command)
+    public void RegisterPacketType<TPacket>(FileCommandKey command)
         where TPacket : FilePackageInfo, new()
     {
         _packetFactories[(byte)command] = new DefaultPacketFactory<TPacket>();
@@ -37,13 +39,13 @@ internal sealed class FilePacketDecode : IPackageDecoder<FilePackageInfo>
 
     public FilePackageInfo Decode(ref ReadOnlySequence<byte> buffer, object context)
     {
-        var reader = new SequenceReader<byte>(buffer);
+        var reader = new SequenceReader<byte>(buffer.Slice(HeadSize));
 
         reader.TryRead(out byte command);
 
         var package = _packetFactories[command].Create();
 
-        package.Key = (CommandKey)command;
+        package.Key = (FileCommandKey)command;
         package.DecodeBody(ref reader, context);
 
         return package;

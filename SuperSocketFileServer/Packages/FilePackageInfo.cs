@@ -6,9 +6,9 @@ using System.Text;
 
 namespace SuperSocketFileServer;
 
-public abstract class FilePackageInfo : IKeyedPackageInfo<CommandKey>
+public abstract class FilePackageInfo : IKeyedPackageInfo<FileCommandKey>
 {
-    public CommandKey Key { get; set; }
+    public FileCommandKey Key { get; set; }
 
     internal protected abstract void DecodeBody(ref SequenceReader<byte> reader, object context);
 

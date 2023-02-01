@@ -7,11 +7,11 @@ using SuperSocketFileServer;
 using supersocketIocpServer;
 
 await SuperSocketHostBuilder.Create<FilePackageInfo, FilePipeLineFilter>()
-    .UseSession<MyAppSession>()
-    .UsePackageDecoder<FilePacketDecode>()
-    .UseCommand(options => options.AddCommandAssembly(typeof(Data).Assembly))
+    .UseSession<FileAppSession>()
+    .UsePackageDecoder<FilePackageDecode>()
+    .UseCommand(options => options.AddCommandAssembly(typeof(DataCommand).Assembly))
+    .UseChannelCreatorFactory<TcpIocpChannelCreatorFactory>()
     .ConfigureServices(
         (context, service) => service.AddSingleton<IPackageEncoder<FilePackageInfo>, FilePackageEncode>())
-    .UseChannelCreatorFactory<TcpIocpChannelCreatorFactory>()
     .Build()
     .RunAsync();

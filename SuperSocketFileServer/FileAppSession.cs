@@ -6,7 +6,7 @@ using System.IO;
 
 namespace supersocketIocpServer;
 
-public sealed class MyAppSession : AppSession
+public sealed class FileAppSession : AppSession
 {
     private static readonly string FileDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Files");
 
@@ -16,7 +16,7 @@ public sealed class MyAppSession : AppSession
 
     internal FileStream? FileStream { get; set; }
 
-    public MyAppSession(IPackageEncoder<FilePackageInfo> encoder)
+    public FileAppSession(IPackageEncoder<FilePackageInfo> encoder)
     {
         _packageEncoder = encoder;
     }
@@ -64,7 +64,6 @@ public sealed class MyAppSession : AppSession
             else
             {
                 FileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-
             }
 
             FileStream.Position = FileStream.Length;

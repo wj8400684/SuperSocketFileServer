@@ -3,10 +3,10 @@ using supersocketIocpServer;
 
 namespace SuperSocketFileServer;
 
-public abstract class FileAsyncCommand<TPackageInfo> : IAsyncCommand<MyAppSession, FilePackageInfo>
+public abstract class FileAsyncCommand<TPackageInfo> : IAsyncCommand<FileAppSession, FilePackageInfo>
     where TPackageInfo : FilePackageInfo
 {
-    async ValueTask IAsyncCommand<MyAppSession, FilePackageInfo>.ExecuteAsync(MyAppSession session, FilePackageInfo package)
+    async ValueTask IAsyncCommand<FileAppSession, FilePackageInfo>.ExecuteAsync(FileAppSession session, FilePackageInfo package)
     {
         try
         {
@@ -18,14 +18,14 @@ public abstract class FileAsyncCommand<TPackageInfo> : IAsyncCommand<MyAppSessio
         }
     }
 
-    protected abstract ValueTask ExecuteAsync(MyAppSession session, TPackageInfo package);
+    protected abstract ValueTask ExecuteAsync(FileAppSession session, TPackageInfo package);
 }
 
-public abstract class FileAsyncCommand<TPackageInfo, TAckPackageInfo> : IAsyncCommand<MyAppSession, FilePackageInfo>
+public abstract class FileAsyncCommand<TPackageInfo, TAckPackageInfo> : IAsyncCommand<FileAppSession, FilePackageInfo>
     where TPackageInfo : FilePackageInfo
     where TAckPackageInfo : FileAckPackageInfo
 {
-    async ValueTask IAsyncCommand<MyAppSession, FilePackageInfo>.ExecuteAsync(MyAppSession session, FilePackageInfo package)
+    async ValueTask IAsyncCommand<FileAppSession, FilePackageInfo>.ExecuteAsync(FileAppSession session, FilePackageInfo package)
     {
         TAckPackageInfo ackPackage;
 
@@ -41,5 +41,5 @@ public abstract class FileAsyncCommand<TPackageInfo, TAckPackageInfo> : IAsyncCo
         await session.SendPackageAsync(ackPackage);
     }
 
-    protected abstract ValueTask<TAckPackageInfo> ExecuteAsync(MyAppSession session, TPackageInfo package);
+    protected abstract ValueTask<TAckPackageInfo> ExecuteAsync(FileAppSession session, TPackageInfo package);
 }
