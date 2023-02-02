@@ -8,7 +8,7 @@ public sealed class UploadCommand : FileAsyncCommand<UpLoadPackageInfo, UpLoadAc
 {
     protected override async ValueTask<UpLoadAckPackageInfo> ExecuteAsync(FileAppSession session, UpLoadPackageInfo package)
     {
-        session.LogInformation($"开始传输文件：[{package.FileName}] 长度：{package.FileLength}");
+        session.LogInformation($"开始传输文件：[{package.FileName}] 大小：{package.FileLength} b");
 
         await session.CreateFileAsync(package.FileName, package.RelativeDirectory);
 
